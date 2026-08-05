@@ -122,51 +122,46 @@ const client = mqtt.connect(broker, {
 });
 
 client.on("connect",()=>{
-
     document.getElementById("status").innerHTML="🟢 Yhdistetty HiveMQ:lle";
-
-    client.subscribe(topic);
-
+    //client.subscribe(topic);
+    client.subscribe(topic, function(err){
+        if(err){
+            document.getElementById("status").innerHTML =
+                "🔴 Tilaus epäonnistui";
+            console.log(err);
+        }else{
+            document.getElementById("status").innerHTML =
+                "🟢 Yhdistetty HiveMQ Cloudiin";
+        }
+    });
 });
 
 client.on("reconnect",()=>{
-
     document.getElementById("status").innerHTML="🟡 Yhdistetään uudelleen...";
-
 });
 
 client.on("error",(err)=>{
-
     document.getElementById("status").innerHTML="🔴 Virhe";
-
     console.log(err);
 
 });
 
 client.on("message",(topic,message)=>{
-
     try{
-
         const data=JSON.parse(message.toString());
-
         document.getElementById("temperature").innerHTML=
             data.temperature.toFixed(1)+" °C";
-
         document.getElementById("humidity").innerHTML=
             data.humidity.toFixed(1)+" %";
-
         document.getElementById("co2").innerHTML=
             data.co2+" ppm";
 
         document.getElementById("time").innerHTML=
             new Date().toLocaleTimeString();
-
     }
 
     catch(e){
-
         console.log(e);
-
     }
 
 });
