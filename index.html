@@ -106,11 +106,19 @@ Viimeisin päivitys:
 
 <script>
 
-const broker="wss://broker.hivemq.com:8884/mqtt";
+//const broker="wss://broker.hivemq.com:8884/mqtt";
+const broker = "wss://220eb1c6c03d48fea06df6599189b756.s1.eu.hivemq.cloud:8884/mqtt";
 const topic="scd30";
 
-const client=mqtt.connect(broker,{
-    clientId:"viewer_"+Math.random().toString(16).substr(2,8)
+//const client=mqtt.connect(broker,{
+//    clientId:"viewer_"+Math.random().toString(16).substr(2,8)
+//});
+const client = mqtt.connect(broker, {
+    clientId: "viewer_" + Math.random().toString(16).substr(2,8),
+    username: "EDUKO3sub",
+    password: "qWeRtY123",
+    clean: true,
+    reconnectPeriod: 5000
 });
 
 client.on("connect",()=>{
