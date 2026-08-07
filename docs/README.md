@@ -2,4 +2,4 @@
 
 # MQTT Dashboard
 
-![Dashboard](docs/dashboard.png)
+![Dashboard](dashboard.png)
