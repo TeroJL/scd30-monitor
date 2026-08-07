@@ -18,6 +18,8 @@ A real-time overview of all connected MQTT devices.
 - Latest Shelly Plug measurements
 - Navigation to all monitoring pages
 
+![Dashboard](docs/dashboard.png)
+
 ---
 
 ### 🌡️ SCD30 Monitor
