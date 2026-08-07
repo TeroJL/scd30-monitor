@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fi">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>MQTT JSON Viewer</title>
+
+<script src="https://unpkg.com/mqtt@5.15.2/dist/mqtt.min.js"></script>
+
+<style>
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#eceff1;
+    margin:0;
+}
+
+header{
+
+    background:#1976d2;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-size:28px;
+
+}
+
+.container{
+
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+
+}
+
+.card{
+
+    background:white;
+    margin-top:20px;
+    padding:20px;
+    border-radius:8px;
+    box-shadow:0 2px 8px rgba(0,0,0,.2);
+
+}
+
+.status{
+
+    font-weight:bold;
+
+}
+
+pre{
+
+    background:#263238;
+    color:#a5d6a7;
+    padding:15px;
+    border-radius:6px;
+    overflow:auto;
+
+}
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+
+}
+
+td{
+
+    padding:8px;
+    border-bottom:1px solid #ddd;
+
+}
+
+td:first-child{
+
+    width:350px;
+    font-weight:bold;
+
+}
+
+button{
+
+    margin-top:20px;
+    padding:10px 20px;
+    font-size:16px;
+    cursor:pointer;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+MQTT JSON Viewer
+
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<div class="status" id="status">
+
+Yhdistetään...
+
+</div>
+
+<h2 id="topic"></h2>
+
+<p>
+
+Viimeisin vastaanotto:
+<span id="time">-</span>
+
+</p>
+
+<p>
+
+Viestien määrä:
+<span id="count">0</span>
+
+</p>
+
+<button onclick="history.back()">
+
+← Takaisin
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>JSON</h2>
+
+<pre id="json"></pre>
+
+</div>
+
+<div class="card">
+
+<h2>Kentät</h2>
+
+<table id="table">
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+const params=new URLSearchParams(window.location.search);
+
+const topic=params.get("topic");
+
+document.getElementById("topic").innerHTML=topic;
+
+const broker="wss://220eb1c6c03d48fea06df6599189b756.s1.eu.hivemq.cloud:8884/mqtt";
+
+const client=mqtt.connect(broker,{
+
+clientId:"JSONViewer_"+Math.random().toString(16).substring(2),
+
+username:"EDUKORAU3sub",
+
+password:"qWeRtY123",
+
+clean:true
+
+});
+
+let counter=0;
+
+client.on("connect",()=>{
+
+document.getElementById("status").innerHTML="🟢 Yhdistetty";
+
+client.subscribe(topic);
+
+});
+
+client.on("message",(topic,message)=>{
+
+counter++;
+
+document.getElementById("count").innerHTML=counter;
+
+document.getElementById("time").innerHTML=new Date().toLocaleTimeString();
+
+let text=message.toString();
+
+document.getElementById("json").textContent=text;
+
+let table=document.getElementById("table");
+
+table.innerHTML="";
+
+try{
+
+const obj=JSON.parse(text);
+
+function walk(prefix,value){
+
+    if(typeof value==="object" && value!==null){
+
+        for(const key in value){
+
+            walk(prefix==""?key:prefix+"."+key,value[key]);
+
+        }
+
+    }
+
+    else{
+
+        let tr=document.createElement("tr");
+
+        let td1=document.createElement("td");
+
+        let td2=document.createElement("td");
+
+        td1.textContent=prefix;
+
+        td2.textContent=value;
+
+        tr.appendChild(td1);
+
+        tr.appendChild(td2);
+
+        table.appendChild(tr);
+
+    }
+
+}
+
+walk("",obj);
+
+}
+catch(e){
+
+let tr=document.createElement("tr");
+
+let td=document.createElement("td");
+
+td.colSpan=2;
+
+td.textContent="Payload ei ole JSON-muotoinen.";
+
+tr.appendChild(td);
+
+table.appendChild(tr);
+
+}
+
+});
+
+client.on("error",(e)=>{
+
+document.getElementById("status").innerHTML="🔴 "+e;
+
+});
+
+</script>
+
+</body>
+
+</html>
