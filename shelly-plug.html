@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Shelly Plug S Gen3 Monitor</title>
+
+<script src="https://unpkg.com/mqtt@5.15.2/dist/mqtt.min.js"></script>
+
+<style>
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#eceff1;
+    margin:0;
+}
+
+header{
+    background:#1976d2;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-size:28px;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+.status{
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+.topic{
+
+    font-size:18px;
+    margin-top:15px;
+    color:#1976d2;
+
+}
+
+.card{
+
+    background:white;
+    border-radius:8px;
+    padding:15px;
+    margin-top:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,.2);
+
+}
+
+pre{
+
+    background:#263238;
+    color:#a5d6a7;
+    padding:15px;
+    overflow:auto;
+    font-size:14px;
+    border-radius:5px;
+
+}
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+
+}
+
+td{
+
+    border-bottom:1px solid #ddd;
+    padding:6px;
+
+}
+
+td:first-child{
+
+    font-weight:bold;
+    width:320px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+Shelly Plug S Gen3 MQTT Monitor
+
+</header>
+
+<div class="container">
+
+<div class="status" id="status">
+Yhdistetään...
+</div>
+
+<div class="topic" id="topic">
+Ei viestejä
+</div>
+
+<div class="card">
+
+<h2>JSON</h2>
+
+<pre id="json"></pre>
+
+</div>
+
+<div class="card">
+
+<h2>Kentät</h2>
+
+<table id="table">
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+const broker="wss://220eb1c6c03d48fea06df6599189b756.s1.eu.hivemq.cloud:8884/mqtt";
+
+const client=mqtt.connect(broker,{
+
+clientId:"ShellyViewer_"+Math.random().toString(16).substring(2),
+
+username:"EDUKORAU3sub",
+
+password:"qWeRtY123",
+
+clean:true
+
+});
+
+client.on("connect",()=>{
+
+document.getElementById("status").innerHTML="🟢 Yhdistetty HiveMQ Cloudiin";
+
+client.subscribe("shelly/plug1/#");
+
+});
+
+client.on("message",(topic,message)=>{
+
+document.getElementById("topic").innerHTML="Aihe: "+topic;
+
+document.getElementById("json").textContent=
+JSON.stringify(JSON.parse(message.toString()),null,4);
+
+const obj=JSON.parse(message.toString());
+
+const table=document.getElementById("table");
+
+table.innerHTML="";
+
+function walk(prefix,value){
+
+    if(typeof value==="object" && value!==null){
+
+        for(const k in value){
+
+            walk(prefix==""?k:prefix+"."+k,value[k]);
+
+        }
+
+    }
+
+    else{
+
+        let row=document.createElement("tr");
+
+        let c1=document.createElement("td");
+
+        let c2=document.createElement("td");
+
+        c1.innerHTML=prefix;
+
+        c2.innerHTML=value;
+
+        row.appendChild(c1);
+
+        row.appendChild(c2);
+
+        table.appendChild(row);
+
+    }
+
+}
+
+walk("",obj);
+
+});
+
+client.on("error",(e)=>{
+
+document.getElementById("status").innerHTML="🔴 "+e;
+
+});
+
+</script>
+
+</body>
+</html>
