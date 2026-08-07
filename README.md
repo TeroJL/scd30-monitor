@@ -1,53 +1,79 @@
-# MQTT IoT Monitoring Dashboard
+# MQTT Dashboard
 
-A web-based MQTT monitoring dashboard built with **GitHub Pages**, **HiveMQ Cloud** and **ESP32** devices.
+A web-based MQTT monitoring dashboard built with **GitHub Pages**, **HiveMQ Cloud**, and **ESP32** devices.
 
-The project provides a real-time browser interface for monitoring MQTT topics and IoT devices without requiring a backend server. Data is received directly from HiveMQ Cloud over a secure WebSocket connection (WSS).
+The application connects directly to an MQTT broker over secure WebSockets (WSS) and provides a modern browser interface for monitoring IoT devices in real time. No backend server is required.
 
 ---
 
 ## Features
 
-### 🌡️ SCD30 Indoor Air Quality Monitor
+### 🏠 Dashboard
 
-Displays real-time measurements from a Sensirion SCD30 sensor.
+A real-time overview of all connected MQTT devices.
+
+- Connection status
+- Number of discovered MQTT topics
+- Latest SCD30 measurements
+- Latest Shelly Plug measurements
+- Navigation to all monitoring pages
+
+---
+
+### 🌡️ SCD30 Monitor
+
+Displays indoor air quality measurements from a Sensirion SCD30 sensor.
 
 Measured values:
 
 - CO₂ concentration (ppm)
 - Temperature (°C)
 - Relative humidity (%)
-- Last update time
+- Last update timestamp
+
+MQTT Topic
+
+```
+scd30/data
+```
+
+Example payload
+
+```json
+{
+  "co2": 533,
+  "temperature": 27.6,
+  "humidity": 40.5
+}
+```
 
 ---
 
 ### 🔌 Shelly Plug S Gen3 Monitor
 
-Displays all MQTT data published by a Shelly Plug S Gen3.
+Displays all MQTT messages published by a Shelly Plug S Gen3.
 
 Features:
 
 - Automatic JSON parsing
-- Displays all MQTT fields
-- Nested JSON objects are flattened into a readable table
-- Live updates
+- Live MQTT updates
+- Hierarchical JSON field viewer
+- Easy inspection of all published values
 
 ---
 
 ### 📡 MQTT Topics Monitor
 
-A browser-based MQTT Topic Explorer.
+Automatically discovers every MQTT topic available to the connected client.
 
-Features:
+For every topic the application displays:
 
-- Subscribe to all topics (`#`)
-- Automatically discovers new MQTT topics
-- Displays:
-  - Topic name
-  - Message counter
-  - Last update time
-  - Latest payload
-- Click any topic to inspect it in detail
+- Topic name
+- Message counter
+- Last received timestamp
+- Latest payload
+
+Every topic is clickable and opens the JSON Viewer.
 
 ---
 
@@ -55,16 +81,17 @@ Features:
 
 Displays all messages from a selected MQTT topic.
 
-Features:
+Features
 
 - Topic selected through URL parameter
-- Pretty JSON view
+- Live updates
+- Pretty JSON formatting
 - Automatic JSON parsing
-- Table view of every JSON field
-- Live message counter
-- Last received timestamp
+- JSON field table
+- Message counter
+- Last update timestamp
 
-Example:
+Example
 
 ```
 json.html?topic=scd30%2Fdata
@@ -72,115 +99,117 @@ json.html?topic=scd30%2Fdata
 
 ---
 
-## Hardware
+## Technologies
 
-- Wemos D1 R32 (ESP32)
-- Sensirion SCD30 CO₂ Sensor
+### Hardware
+
+- ESP32 (Wemos D1 R32)
+- Sensirion SCD30
 - Shelly Plug S Gen3
 - Shelly Gen3 devices
-- Wi-Fi network
 
----
-
-## Software
+### Software
 
 - Arduino IDE
 - ESP32 Arduino Framework
 - HiveMQ Cloud
 - MQTT.js
-- HTML
-- CSS
-- JavaScript
+- HTML5
+- CSS3
+- JavaScript (ES6)
 - GitHub Pages
-
----
-
-## MQTT Broker
-
-HiveMQ Cloud
-
-Protocol:
-
-- MQTT over TLS
-- Secure WebSockets (WSS)
-
----
-
-## Example MQTT Message
-
-Topic
-
-```
-scd30/data
-```
-
-Payload
-
-```json
-{
-  "co2": 533,
-  "temperature": 27.57,
-  "humidity": 40.57
-}
-```
 
 ---
 
 ## Project Structure
 
 ```
-/
-├── index.html            SCD30 dashboard
-├── shelly-plug.html      Shelly Plug monitor
-├── topics.html           MQTT Topic Explorer
-├── json.html             Topic JSON Viewer
+mqtt-dashboard/
+
+├── index.html          Dashboard
+├── scd30.html          SCD30 Monitor
+├── shelly-plug.html    Shelly Plug Monitor
+├── topics.html         MQTT Topics Monitor
+├── json.html           JSON Viewer
 ├── favicon.ico
 └── README.md
 ```
 
 ---
 
-## Current Capabilities
+## MQTT Broker
 
-- ✅ Secure connection to HiveMQ Cloud
-- ✅ MQTT over WebSockets
-- ✅ Real-time updates
+The application communicates with an MQTT broker using
+
+- MQTT 5
+- TLS encryption
+- Secure WebSockets (WSS)
+
+---
+
+## Current Features
+
+- ✅ Real-time MQTT monitoring
 - ✅ Automatic topic discovery
+- ✅ Secure WebSocket connection
 - ✅ JSON decoding
-- ✅ Supports multiple MQTT devices
+- ✅ Nested JSON field viewer
+- ✅ Responsive layout
+- ✅ Mobile friendly
 - ✅ GitHub Pages hosting
-- ✅ Mobile friendly interface
+- ✅ Multiple device support
 
 ---
 
 ## Planned Features
 
-- Historical charts
-  - 1 hour
-  - 24 hours
-  - 7 days
-- Search topics
-- Dark mode
-- MQTT publish support
-- Device control (Shelly ON/OFF)
-- Historical database integration
-- Export to CSV / JSON
-- Dashboard with multiple device cards
-- User authentication
+- 📈 Historical charts
+  - Last hour
+  - Last 24 hours
+  - Last 7 days
+- 🔍 Topic filtering
+- 🌙 Dark mode
+- 🔔 Alarm notifications
+- ⚡ MQTT Publish page
+- 🎛 Device control
+- 💾 Historical database
+- 📤 Export to CSV / JSON
+- 👥 User authentication
+- 📊 Automatic dashboard cards for discovered devices
 
 ---
 
 ## Screenshots
 
-Current pages:
+Current application pages
 
-- SCD30 Indoor Air Quality Monitor
+- Dashboard
+- SCD30 Monitor
 - Shelly Plug S Gen3 Monitor
 - MQTT Topics Monitor
 - JSON Viewer
 
 ---
 
+## Future Goals
+
+The long-term goal is to create a lightweight, browser-based MQTT monitoring platform that can monitor any MQTT-enabled IoT device without requiring dedicated desktop software.
+
+Supported device types will include:
+
+- Environmental sensors
+- Smart plugs
+- Energy meters
+- Temperature sensors
+- Humidity sensors
+- CO₂ sensors
+- Shelly devices
+- ESP32-based DIY devices
+
+---
+
 ## License
 
-This project is released as open source for educational, research and hobby use.
+This project is released under the MIT License.
+
+Feel free to use, modify and improve it.
