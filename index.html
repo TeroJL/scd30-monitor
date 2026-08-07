@@ -7,7 +7,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>MQTT Dashboard</title>
+
 <script src="https://unpkg.com/mqtt@5.15.2/dist/mqtt.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/index.js"></script>
+
 <link rel="stylesheet" href="css/style.css">
 
 </head>
@@ -105,110 +109,6 @@ Viimeisin päivitys:
 </div>
 
 </div>
-
-<script>
-
-const broker =
-    localStorage.getItem("mqttBroker");
-
-const username =
-    localStorage.getItem("mqttUsername");
-
-const password =
-    localStorage.getItem("mqttPassword");
-
-if(!broker || !username || !password){
-
-    window.location.href="login.html";
-
-}
-
-const client = mqtt.connect(broker,{
-
-    clientId:
-        "MQTTDashboard_" +
-        Math.random().toString(16).substring(2),
-
-    username: username,
-
-    password: password,
-
-    clean: true
-
-});
-
-const topicSet=new Set();
-
-client.on("connect",()=>{
-
-document.getElementById("status").innerHTML=
-"🟢 Yhdistetty HiveMQ Cloudiin";
-
-client.subscribe("#");
-
-});
-
-client.on("message",(topic,message)=>{
-
-topicSet.add(topic);
-
-document.getElementById("topics").innerHTML=topicSet.size;
-
-let payload=message.toString();
-
-try{
-
-const data=JSON.parse(payload);
-
-if(topic==="scd30/data"){
-
-document.getElementById("temperature").innerHTML=
-data.temperature.toFixed(1)+" °C";
-
-document.getElementById("humidity").innerHTML=
-data.humidity.toFixed(1)+" %";
-
-document.getElementById("co2").innerHTML=
-data.co2+" ppm";
-
-document.getElementById("scdtime").innerHTML=
-new Date().toLocaleTimeString();
-
-}
-
-if(topic.endsWith("/events/rpc")){
-
-const sw=data.params?.["switch:0"];
-
-if(sw){
-
-document.getElementById("power").innerHTML=
-(sw.apower ?? 0).toFixed(1)+" W";
-
-document.getElementById("voltage").innerHTML=
-(sw.voltage ?? "-");
-
-document.getElementById("current").innerHTML=
-(sw.current ?? "-");
-
-document.getElementById("relay").innerHTML=
-sw.output ? "ON" : "OFF";
-
-document.getElementById("plugtime").innerHTML=
-new Date().toLocaleTimeString();
-
-}
-
-}
-
-}
-catch(e){
-
-}
-
-});
-
-</script>
 
 </body>
 
